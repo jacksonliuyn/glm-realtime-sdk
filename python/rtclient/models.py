@@ -113,6 +113,15 @@ class InputAudioBufferAppendMessage(ClientMessageBase):
     audio: str
 
 
+class InputVideoFrameAppendMessage(ClientMessageBase):
+    """
+    在视频通话模式中上报视频帧。
+    """
+    type: Literal["input_audio_buffer.append_video_frame"] = "input_audio_buffer.append_video_frame"
+    video_frame: str  # base64编码的图片数据
+    client_timestamp: Optional[int] = None
+
+
 class InputAudioBufferCommitMessage(ClientMessageBase):
     """
     Commit the pending user audio buffer, which creates a user message item with the audio content
@@ -540,6 +549,7 @@ UserMessageType = Annotated[
     Union[
         SessionUpdateMessage,
         InputAudioBufferAppendMessage,
+        InputVideoFrameAppendMessage,
         InputAudioBufferCommitMessage,
         InputAudioBufferClearMessage,
         ItemCreateMessage,

@@ -25,7 +25,7 @@
 
 ### 1. 环境准备
 
-首先确保您已安装 Python 3.8 或更高版本。
+首先确保您已安装 Python 3.10 或更高版本。
 
 ### 2. 安装配置
 
@@ -89,12 +89,6 @@ python samples/low_level_sample_audio.py samples/input/give_me_a_joke.wav
 python samples/low_level_sample_video.py samples/input/what_you_see_tts.wav samples/input/programmer.jpg
 ```
 
-## 音频格式要求
-
-- 支持的音频格式：WAV
-- 采样率：16000Hz
-- 位深度：16bit
-- 声道：单声道
 
 ## 视频格式要求
 

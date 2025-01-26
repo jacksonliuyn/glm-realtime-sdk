@@ -4,13 +4,19 @@ import os
 import signal
 import sys
 import time
-from io import BytesIO
 from typing import Optional
 
 from dotenv import load_dotenv
-from PIL import Image
 
 from rtclient import RTLowLevelClient
+from rtclient.models import (
+    ClientVAD,
+    InputAudioBufferAppendMessage,
+    InputAudioBufferCommitMessage,
+    InputVideoFrameAppendMessage,
+    SessionUpdateMessage,
+    SessionUpdateParams,
+)
 
 # 全局变量用于控制程序状态
 shutdown_event: Optional[asyncio.Event] = None
@@ -41,46 +47,37 @@ def encode_image_to_base64(image_path: str) -> str:
 
 async def send_media(client: RTLowLevelClient, audio_file_path: str, image_file_path: str):
     """发送音频和视频帧，实现异步发送和时间戳管理"""
-    # 编码音频
+    # 编码音频和图片
     with open(audio_file_path, 'rb') as audio_file:
         audio_base64 = base64.b64encode(audio_file.read()).decode('utf-8')
     
-    # 编码图片
     image_base64 = encode_image_to_base64(image_file_path)
     if image_base64 is None:
         print("图片编码失败")
         return
 
-    # 基准时间戳
     base_timestamp = int(time.time() * 1000)
-    
-    # 视频发送间隔(ms)，2fps
     VIDEO_INTERVAL = 500   # 每500ms发送一帧，2fps
     
     async def send_audio():
         """异步发送音频数据"""
-        # 发送音频数据，只发送一次
-        audio_data = {
-            "type": "input_audio_buffer.append",
-            "audio": audio_base64,
-            "client_timestamp": base_timestamp
-        }
-        await client.send_json(audio_data)
+        audio_message = InputAudioBufferAppendMessage(
+            audio=audio_base64,
+            client_timestamp=base_timestamp
+        )
+        await client.send(audio_message)
     
     async def send_video():
         """异步发送视频帧"""
         video_timestamp = base_timestamp
-        # 在音频持续时间内发送视频帧
-        # 假设音频长度为1秒，则需要发送2帧
         for _ in range(2):  # 2fps
-            video_data = {
-                "type": "input_audio_buffer.append_video_frame",
-                "video_frame": image_base64,
-                "client_timestamp": video_timestamp
-            }
-            await client.send_json(video_data)
+            video_message = InputVideoFrameAppendMessage(
+                video_frame=image_base64,
+                client_timestamp=video_timestamp
+            )
+            await client.send(video_message)
             video_timestamp += VIDEO_INTERVAL
-            await asyncio.sleep(VIDEO_INTERVAL / 1000)  # 转换为秒
+            await asyncio.sleep(VIDEO_INTERVAL / 1000)
     
     # 创建音频和视频的异步任务
     audio_task = asyncio.create_task(send_audio())
@@ -90,11 +87,10 @@ async def send_media(client: RTLowLevelClient, audio_file_path: str, image_file_
     await asyncio.gather(audio_task, video_task)
     
     # 发送音频缓冲区提交信号
-    commit_data = {
-        "type": "input_audio_buffer.commit",
-        "client_timestamp": int(time.time() * 1000)
-    }
-    await client.send_json(commit_data)
+    commit_message = InputAudioBufferCommitMessage(
+        client_timestamp=int(time.time() * 1000)
+    )
+    await client.send(commit_message)
 
 
 async def receive_messages(client: RTLowLevelClient):
@@ -123,6 +119,10 @@ async def receive_messages(client: RTLowLevelClient):
                     case "error":
                         print("错误消息")
                         print(f"  Error: {message.error}")
+
+                    case "session.updated":
+                        print("会话更新消息")
+                        print(f"updated session: {message.session}")
                     
                     case "input_audio_buffer.committed":
                         print("音频缓冲区提交消息")
@@ -216,25 +216,25 @@ async def with_zhipu(audio_file_path: str, image_file_path: str):
     api_key = get_env_var("ZHIPU_API_KEY")
     try:
         async with RTLowLevelClient(url="wss://open.bigmodel.cn/api/paas/v4/realtime", headers={"Authorization": f"Bearer {api_key}"}) as client:
-            # 发送会话配置
             if shutdown_event.is_set():
                 return
                 
-            await client.send_json({
-                "type": "session.update",
-                "session": {
-                    "input_audio_format": "wav",
-                    "output_audio_format": "pcm",
-                    "modalities": ["audio", "text"],
-                    "turn_detection": {"type": "client_vad"},
-                    "beta_fields": {
+            # 使用消息模型发送会话配置
+            session_message = SessionUpdateMessage(
+                session=SessionUpdateParams(
+                    input_audio_format="wav",
+                    output_audio_format="pcm",
+                    modalities={"audio", "text"},
+                    turn_detection=ClientVAD(),
+                    beta_fields={
                         "chat_mode": "video_passive",
                         "tts_source": "e2e",
                         "auto_search": False
                     },
-                    "tools": []
-                }
-            })
+                    tools=[]
+                )
+            )
+            await client.send(session_message)
             
             if shutdown_event.is_set():
                 return

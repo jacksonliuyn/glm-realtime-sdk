@@ -10,12 +10,15 @@ import wave
 from io import BytesIO
 from typing import Optional
 
-import numpy as np
 from dotenv import load_dotenv
-from scipy.signal import resample
 
-from rtclient import (
-    RTLowLevelClient,
+from rtclient import RTLowLevelClient
+from rtclient.models import (
+    ClientVAD,
+    InputAudioBufferAppendMessage,
+    InputAudioBufferCommitMessage,
+    SessionUpdateMessage,
+    SessionUpdateParams,
 )
 
 # 全局变量用于控制程序状态
@@ -27,11 +30,6 @@ def handle_shutdown(sig=None, frame=None):
         print("\n正在关闭程序...")
         shutdown_event.set()
 
-
-def resample_audio(audio_data, original_sample_rate, target_sample_rate):
-    number_of_samples = round(len(audio_data) * float(target_sample_rate) / original_sample_rate)
-    resampled_audio = resample(audio_data, number_of_samples)
-    return resampled_audio.astype(np.int16)
 
 
 def encode_wave_to_base64(wave_file_path):
@@ -90,12 +88,11 @@ async def send_audio(client: RTLowLevelClient, audio_file_path: str):
         return
         
     # 发送音频数据
-    audio_data = {
-        "type": "input_audio_buffer.append",
-        "audio": base64_content,
-        "client_timestamp": int(asyncio.get_event_loop().time() * 1000)
-    }
-    await client.send_json(audio_data)
+    audio_message = InputAudioBufferAppendMessage(
+        audio=base64_content,
+        client_timestamp=int(asyncio.get_event_loop().time() * 1000)
+    )
+    await client.send(audio_message)
 
 
 async def receive_messages(client: RTLowLevelClient):
@@ -124,7 +121,10 @@ async def receive_messages(client: RTLowLevelClient):
                     case "error":
                         print("错误消息")
                         print(f"  Error: {message.error}")
-                    
+                    case "session.updated":
+                        print("会话更新消息")
+                        print(f"updated session: {message.session}")
+                
                     case "input_audio_buffer.committed":
                         print("音频缓冲区提交消息")
                         print(f"  Item Id: {message.item_id}")
@@ -213,17 +213,21 @@ async def with_zhipu(audio_file_path: str):
             if shutdown_event.is_set():
                 return
                 
-            await client.send_json({
-                "type": "session.update",
-                "session": {
-                    "input_audio_format": "wav",
-                    "output_audio_format": "pcm",
-                    "modalities": ["audio", "text"],
-                    "turn_detection": {"type": "client_vad"},
-                    "beta_fields": {"chat_mode": "audio", "tts_source": "e2e", "auto_search": False},
-                    "tools": []
-                }
-            })
+            session_message = SessionUpdateMessage(
+                session=SessionUpdateParams(
+                    input_audio_format="wav",
+                    output_audio_format="pcm",
+                    modalities={"audio", "text"},
+                    turn_detection=ClientVAD(),
+                    beta_fields={
+                        "chat_mode": "audio",
+                        "tts_source": "e2e",
+                        "auto_search": False
+                    },
+                    tools=[]
+                )
+            )
+            await client.send(session_message)
             
             if shutdown_event.is_set():
                 return
@@ -235,10 +239,10 @@ async def with_zhipu(audio_file_path: str):
                 return
                 
             # 提交音频缓冲区
-            await client.send_json({
-                "type": "input_audio_buffer.commit",
-                "client_timestamp": int(asyncio.get_event_loop().time() * 1000)
-            })
+            commit_message = InputAudioBufferCommitMessage(
+                client_timestamp=int(asyncio.get_event_loop().time() * 1000)
+            )
+            await client.send(commit_message)
             
             # 接收消息
             await receive_messages(client)

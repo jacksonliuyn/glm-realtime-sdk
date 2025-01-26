@@ -57,15 +57,17 @@ class RTLowLevelClient:
             error_message = f"连接服务器失败，状态码: {e.status}"
             raise ConnectionError(error_message, e.headers) from e
 
-    async def send(self, message: dict[str, Any]):
+    async def send(self, message: UserMessageType | dict[str, Any]):
         """发送消息到服务器
 
         Args:
-            message: 要发送的消息
+            message: 要发送的消息，可以是 UserMessageType 或 dict
         """
-        if isinstance(message, (UserMessageType, dict)):
-            message_data = message.model_dump_json(exclude_unset=True) if hasattr(message, 'model_dump_json') else json.dumps(message)
-            await self.ws.send_str(message_data)
+        if hasattr(message, 'model_dump_json'):
+            message_data = message.model_dump_json()
+        else:
+            message_data = json.dumps(message)
+        await self.ws.send_str(message_data)
 
     async def send_json(self, message: dict[str, Any]):
         """发送JSON消息到服务器

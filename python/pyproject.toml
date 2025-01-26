@@ -19,9 +19,7 @@ pillow = "^11.1.0"
 ruff = "*"
 black = "*"
 python-dotenv = "*"
-soundfile = "*"
-numpy = "*"
-scipy = "*"
+
 pytest = "*"
 pytest-asyncio = "*"
 
