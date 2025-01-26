@@ -1,41 +1,111 @@
 # 智谱 Realtime Python Low Level SDK
 
-## How to use
+## 项目结构
+```
+.
+├── LICENSE.md               # 许可证文件
+├── README.md               # 项目说明文档
+├── Realtime接口文档.md      # API接口详细文档
+├── python/                 # Python SDK 主目录
+│   ├── rtclient/          # SDK 核心代码
+│   │   ├── __init__.py    # 包初始化文件
+│   │   ├── models.py      # 数据模型定义
+│   │   └── low_level_client.py  # 底层客户端实现
+│   ├── samples/           # 示例代码
+│   │   ├── input/        # 示例输入文件
+│   │   ├── low_level_sample_audio.py  # 音频模式示例
+│   │   └── low_level_sample_video.py  # 视频模式示例
+│   ├── pyproject.toml    # Poetry 项目配置文件
+│   ├── poetry.lock       # Poetry 依赖锁定文件
+│   └── .env.example      # 环境变量示例文件
+└── CHANGELOG.md          # 版本更新日志
+```
 
-1. 安装依赖
+## 快速开始
 
-安装poetry
+### 1. 环境准备
+
+首先确保您已安装 Python 3.8 或更高版本。
+
+### 2. 安装配置
+
+进入 Python SDK 目录：
+```bash
+cd python
+```
+
+#### 2.1 安装 Poetry
 
 ```bash
 pip install poetry
 ```
 
-安装依赖
+#### 2.2 安装项目依赖
 
 ```bash
 poetry install
 ```
 
-启动开发环境
+#### 2.3 激活虚拟环境
 
 ```bash
 poetry shell
 ```
 
-2. 设置环境变量
+### 3. 配置 API 密钥
 
-apikey 获取方式：https://www.bigmodel.cn/ 
-注册开发者账号, 创建apikey
+您需要设置 ZHIPU_API_KEY 环境变量。可以通过以下两种方式之一进行设置：
+
+#### 方式一：直接设置环境变量
 
 ```bash
 export ZHIPU_API_KEY=your_api_key
 ```
 
-3. 运行示例
+#### 方式二：使用 .env 文件
+
+复制环境变量示例文件并修改：
+```bash
+cp .env.example .env
+```
+然后编辑 .env 文件，填入您的 API 密钥：
+```
+ZHIPU_API_KEY=your_api_key
+```
+
+> 注：API 密钥可在 [智谱 AI 开放平台](https://www.bigmodel.cn/) 注册开发者账号后创建获取
+
+### 4. 运行示例
+
+#### 4.1 音频模式示例
 
 ```bash
-
-python samples/low_level_sample.py <audio_file_path>
-
-#example: cd samples && python low_level_sample.py input/arc-easy-q237-tts.wav
+python samples/low_level_sample_audio.py samples/input/give_me_a_joke.wav
 ```
+
+#### 4.2 视频模式示例
+
+```bash
+python samples/low_level_sample_video.py samples/input/what_you_see_tts.wav samples/input/programmer.jpg
+```
+
+## 音频格式要求
+
+- 支持的音频格式：WAV
+- 采样率：16000Hz
+- 位深度：16bit
+- 声道：单声道
+
+## 视频格式要求
+
+- 支持的图片格式：JPG、PNG
+- 建议分辨率：不超过 1920x1080
+- 文件大小：建议小于 2MB
+
+## 许可证
+
+本项目采用 [LICENSE.md](LICENSE.md) 中规定的许可证。
+`
+## 更新日志
+
+详见 [CHANGELOG.md](CHANGELOG.md)。

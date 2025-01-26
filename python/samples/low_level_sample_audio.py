@@ -133,20 +133,15 @@ async def receive_messages(client: RTLowLevelClient):
                     
                     case "input_audio_buffer.speech_started":
                         print("语音开始消息")
-                        print(f"  Item Id: {message.item_id}")
                     
                     case "input_audio_buffer.speech_stopped":
                         print("语音结束消息")
-                        print(f"  Item Id: {message.item_id}")
                     
                     case "conversation.item.created":
                         print("会话项目创建消息")
-                        print(f"  Id: {message.item.id}")
                     
                     case "conversation.item.input_audio_transcription.completed":
                         print("输入音频转写完成消息")
-                        print(f"  Id: {message.item_id}")
-                        print(f"  Content Index: {message.content_index}")
                         print(f"  Transcript: {message.transcript}")
                     
                     

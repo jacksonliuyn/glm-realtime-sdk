@@ -12,6 +12,8 @@ authors = ["ZhiPu Corporation"]
 python = ">=3.10"
 aiohttp = "*"
 pydantic = "*"
+python-dotenv = "^1.0.1"
+pillow = "^11.1.0"
 
 [tool.poetry.dev-dependencies]
 ruff = "*"
