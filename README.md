@@ -90,12 +90,6 @@ python samples/low_level_sample_video.py samples/input/what_you_see_tts.wav samp
 ```
 
 
-## 视频格式要求
-
-- 支持的图片格式：JPG、PNG
-- 建议分辨率：不超过 1920x1080
-- 文件大小：建议小于 2MB
-
 ## 许可证
 
 本项目采用 [LICENSE.md](LICENSE.md) 中规定的许可证。
