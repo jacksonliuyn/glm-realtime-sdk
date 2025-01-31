@@ -141,7 +141,6 @@ async def receive_messages(client: RTLowLevelClient):
                     
                     case "conversation.item.input_audio_transcription.completed":
                         print("输入音频转写完成消息")
-                        print(f"  Content Index: {message.content_index}")
                         print(f"  Transcript: {message.transcript}")
                     
                     case "response.created":
@@ -164,19 +163,6 @@ async def receive_messages(client: RTLowLevelClient):
                     
                     case "response.audio_transcript.delta":
                         print("模型音频文本增量消息")
-                        print(f"  Response Id: {message.response_id}")
-                        print(f"  Delta: {message.delta if message.delta else 'None'}")
-                    
-                    case "response.video.delta":
-                        print("模型视频增量消息")
-                        print(f"  Response Id: {message.response_id}")
-                        if message.delta:
-                            print(f"  Delta Length: {len(message.delta)}")
-                        else:
-                            print("  Delta: None")
-                    
-                    case "response.video_transcript.delta":
-                        print("模型视频文本增量消息")
                         print(f"  Response Id: {message.response_id}")
                         print(f"  Delta: {message.delta if message.delta else 'None'}")
                     

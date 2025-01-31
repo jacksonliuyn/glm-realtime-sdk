@@ -55,7 +55,6 @@ class InputAudioTranscription(BaseModel):
 
 
 class ClientMessageBase(ModelWithDefaults):
-    _is_azure: bool = False
     event_id: Optional[str] = None
 
 
@@ -89,18 +88,6 @@ class SessionUpdateMessage(ClientMessageBase):
     type: Literal["session.update"] = "session.update"
     session: SessionUpdateParams
 
-    @model_serializer(mode="wrap")
-    def _azure_compatibility(self, next: SerializerFunctionWrapHandler, info: SerializationInfo):
-        serialized = next(self)
-        if not self._is_azure:
-            if (
-                self.session is not None
-                and self.session.turn_detection is not None
-                and self.session.turn_detection.type == "none"
-            ):
-                serialized["session"]["turn_detection"] = None
-
-        return serialized
 
 
 class InputAudioBufferAppendMessage(ClientMessageBase):
