@@ -6,9 +6,6 @@ from typing import Annotated, Any, Literal, Optional, Union
 from pydantic import (
     BaseModel,
     Field,
-    SerializationInfo,
-    SerializerFunctionWrapHandler,
-    model_serializer,
 )
 
 from rtclient.util.model_helpers import ModelWithDefaults

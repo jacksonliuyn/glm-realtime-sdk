@@ -224,15 +224,24 @@ async def with_zhipu(audio_file_path: str, image_file_path: str):
             
             if shutdown_event.is_set():
                 return
-                
-            # 发送音频和视频数据
-            await send_media(client, audio_file_path, image_file_path)
             
-            if shutdown_event.is_set():
-                return
-                
-            # 接收消息
-            await receive_messages(client)
+            # 创建并发任务
+            send_task = asyncio.create_task(send_media(client, audio_file_path, image_file_path))
+            receive_task = asyncio.create_task(receive_messages(client))
+            
+            # 等待任务完成
+            try:
+                await asyncio.gather(send_task, receive_task)
+            except Exception as e:
+                print(f"任务执行出错: {e}")
+                # 取消未完成的任务
+                for task in [send_task, receive_task]:
+                    if not task.done():
+                        task.cancel()
+                        try:
+                            await task
+                        except asyncio.CancelledError:
+                            pass
     except Exception as e:
         print(f"发生错误: {e}")
     finally:

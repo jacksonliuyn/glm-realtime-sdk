@@ -231,21 +231,33 @@ async def with_zhipu(audio_file_path: str):
             
             if shutdown_event.is_set():
                 return
-                
-            # 发送音频数据
-            await send_audio(client, audio_file_path)
+
+            async def send_audio_with_commit():
+                # 发送音频数据
+                await send_audio(client, audio_file_path)
+                # 提交音频缓冲区
+                commit_message = InputAudioBufferCommitMessage(
+                    client_timestamp=int(asyncio.get_event_loop().time() * 1000)
+                )
+                await client.send(commit_message)
             
-            if shutdown_event.is_set():
-                return
-                
-            # 提交音频缓冲区
-            commit_message = InputAudioBufferCommitMessage(
-                client_timestamp=int(asyncio.get_event_loop().time() * 1000)
-            )
-            await client.send(commit_message)
+            # 创建并发任务
+            send_task = asyncio.create_task(send_audio_with_commit())
+            receive_task = asyncio.create_task(receive_messages(client))
             
-            # 接收消息
-            await receive_messages(client)
+            # 等待任务完成
+            try:
+                await asyncio.gather(send_task, receive_task)
+            except Exception as e:
+                print(f"任务执行出错: {e}")
+                # 取消未完成的任务
+                for task in [send_task, receive_task]:
+                    if not task.done():
+                        task.cancel()
+                        try:
+                            await task
+                        except asyncio.CancelledError:
+                            pass
     except Exception as e:
         print(f"发生错误: {e}")
     finally:
