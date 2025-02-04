@@ -23,9 +23,9 @@ class NoTurnDetection(ModelWithDefaults):
 
 class ServerVAD(ModelWithDefaults):
     type: Literal["server_vad"] = "server_vad"
-    threshold: Optional[Annotated[float, Field(strict=True, ge=0.0, le=1.0)]] = None
-    prefix_padding_ms: Optional[int] = None
-    silence_duration_ms: Optional[int] = None
+    threshold: Optional[Annotated[float, Field(strict=True, ge=0.0, le=1.0)]] = 0.0
+    prefix_padding_ms: Optional[int] = 0
+    silence_duration_ms: Optional[int] = 0
 
 
 class ClientVAD(ModelWithDefaults):
@@ -52,7 +52,7 @@ class InputAudioTranscription(BaseModel):
 
 
 class ClientMessageBase(ModelWithDefaults):
-    event_id: Optional[str] = None
+    event_id: Optional[str] = ""
 
 
 Temperature = Annotated[float, Field(strict=True, ge=0, le=1.2)]
@@ -86,7 +86,6 @@ class SessionUpdateMessage(ClientMessageBase):
     session: SessionUpdateParams
 
 
-
 class InputAudioBufferAppendMessage(ClientMessageBase):
     """
     Append audio data to the user audio buffer, this should be in the format specified by
@@ -101,6 +100,7 @@ class InputVideoFrameAppendMessage(ClientMessageBase):
     """
     在视频通话模式中上报视频帧。
     """
+
     type: Literal["input_audio_buffer.append_video_frame"] = "input_audio_buffer.append_video_frame"
     video_frame: str  # base64编码的图片数据
     client_timestamp: Optional[int] = None
@@ -138,7 +138,7 @@ class InputAudioContentPart(ModelWithDefaults):
 
     type: Literal["input_audio"] = "input_audio"
     audio: str
-    transcript: Optional[str] = None
+    transcript: Optional[str] = ""
 
 
 class OutputTextContentPart(ModelWithDefaults):
@@ -158,7 +158,7 @@ ItemParamStatus = Literal["completed", "incomplete"]
 class SystemMessageItem(ModelWithDefaults):
     type: MessageItemType = "message"
     role: Literal["system"] = "system"
-    id: Optional[str] = None
+    id: Optional[str] = ""
     content: list[SystemContentPart]
     status: Optional[ItemParamStatus] = None
 
@@ -166,7 +166,7 @@ class SystemMessageItem(ModelWithDefaults):
 class UserMessageItem(ModelWithDefaults):
     type: MessageItemType = "message"
     role: Literal["user"] = "user"
-    id: Optional[str] = None
+    id: Optional[str] = ""
     content: list[UserContentPart]
     status: Optional[ItemParamStatus] = None
 
@@ -174,7 +174,7 @@ class UserMessageItem(ModelWithDefaults):
 class AssistantMessageItem(ModelWithDefaults):
     type: MessageItemType = "message"
     role: Literal["assistant"] = "assistant"
-    id: Optional[str] = None
+    id: Optional[str] = ""
     content: list[AssistantContentPart]
     status: Optional[ItemParamStatus] = None
 
@@ -184,17 +184,17 @@ MessageItem = Annotated[Union[SystemMessageItem, UserMessageItem, AssistantMessa
 
 class FunctionCallItem(ModelWithDefaults):
     type: Literal["function_call"] = "function_call"
-    id: Optional[str] = None
+    id: Optional[str] = ""
     name: str
-    call_id: str
+    call_id: Optional[str] = ""
     arguments: str
     status: Optional[ItemParamStatus] = None
 
 
 class FunctionCallOutputItem(ModelWithDefaults):
     type: Literal["function_call_output"] = "function_call_output"
-    id: Optional[str] = None
-    call_id: str
+    id: Optional[str] = ""
+    call_id: Optional[str] = ""
     output: str
     status: Optional[ItemParamStatus] = None
 
@@ -388,7 +388,7 @@ class ResponseFunctionCallItem(ResponseItemBase):
     type: Literal["function_call"] = "function_call"
     status: Optional[ItemParamStatus] = None
     name: str
-    call_id: str
+    call_id: Optional[str] = ""
     arguments: str
 
 
@@ -408,7 +408,7 @@ ResponseItem = Annotated[
 
 class ItemCreatedMessage(ServerMessageBase):
     type: Literal["conversation.item.created"] = "conversation.item.created"
-    previous_item_id: Optional[str] = None
+    previous_item_id: Optional[str] = ""
     item: ResponseItem
 
 
@@ -416,9 +416,9 @@ class ItemInputAudioTranscriptionCompletedMessage(ServerMessageBase):
     type: Literal["conversation.item.input_audio_transcription.completed"] = (
         "conversation.item.input_audio_transcription.completed"
     )
-    item_id: Optional[str] = None
-    content_index: Optional[int] = None
-    transcript: Optional[str] = None
+    item_id: Optional[str] = ""
+    content_index: Optional[int] = 0
+    transcript: Optional[str] = ""
 
 
 ResponseStatus = Literal["in_progress", "completed", "cancelled", "incomplete", "failed"]
@@ -446,20 +446,20 @@ ResponseStatusDetails = Annotated[
 
 
 class InputTokenDetails(BaseModel):
-    cached_tokens: Optional[int] = None
-    text_tokens: Optional[int] = None
-    audio_tokens: Optional[int] = None
+    cached_tokens: Optional[int] = 0
+    text_tokens: Optional[int] = 0
+    audio_tokens: Optional[int] = 0
 
 
 class OutputTokenDetails(BaseModel):
-    text_tokens: Optional[int] = None
-    audio_tokens: Optional[int] = None
+    text_tokens: Optional[int] = 0
+    audio_tokens: Optional[int] = 0
 
 
 class Usage(BaseModel):
-    total_tokens: Optional[int] = None
-    input_tokens: Optional[int] = None
-    output_tokens: Optional[int] = None
+    total_tokens: Optional[int] = 0
+    input_tokens: Optional[int] = 0
+    output_tokens: Optional[int] = 0
     input_token_details: Optional[InputTokenDetails] = None
     output_token_details: Optional[OutputTokenDetails] = None
 
@@ -514,12 +514,12 @@ class ResponseAudioDeltaMessage(ServerMessageBase):
 
 class ResponseFunctionCallArgumentsDoneMessage(ServerMessageBase):
     type: Literal["response.function_call_arguments.done"] = "response.function_call_arguments.done"
-    response_id: Optional[str] = None
-    item_id: Optional[str] = None
-    output_index: Optional[int] = None
-    call_id: Optional[str] = None
-    name: Optional[str] = None
-    arguments: Optional[str] = None
+    response_id: str
+    item_id: Optional[str] = ""
+    output_index: Optional[int] = 0
+    call_id: Optional[str] = ""
+    name: str
+    arguments: str
 
 
 class HeartbeatMessage(ServerMessageBase):
