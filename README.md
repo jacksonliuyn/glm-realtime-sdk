@@ -5,7 +5,7 @@
 .
 ├── LICENSE.md               # 许可证文件
 ├── README.md               # 项目说明文档
-├── Realtime接口文档.md      # API接口详细文档
+├── GLM-Realtime-Doc-For-LLM.md      # 智谱 Realtime 接口文档 , 为 LLM 优化
 ├── python/                 # Python SDK 主目录
 │   ├── rtclient/          # SDK 核心代码
 │   │   ├── __init__.py    # 包初始化文件
@@ -87,6 +87,12 @@ python samples/low_level_sample_audio.py samples/input/give_me_a_joke.wav
 
 ```bash
 python samples/low_level_sample_video.py samples/input/what_you_see_tts.wav samples/input/programmer.jpg
+```
+
+#### 4.3 函数调用示例
+
+```bash
+python samples/low_level_sample_function_call.py samples/input/call_zhangsan.wav
 ```
 
 

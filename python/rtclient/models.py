@@ -518,8 +518,8 @@ class ResponseFunctionCallArgumentsDoneMessage(ServerMessageBase):
     item_id: Optional[str] = ""
     output_index: Optional[int] = 0
     call_id: Optional[str] = ""
-    name: str
-    arguments: str
+    name: str = ""
+    arguments: str = ""
 
 
 class HeartbeatMessage(ServerMessageBase):
