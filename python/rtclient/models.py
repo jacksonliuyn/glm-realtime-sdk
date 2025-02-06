@@ -209,16 +209,6 @@ class ItemCreateMessage(ClientMessageBase):
     item: Item
 
 
-class ItemTruncateMessage(ClientMessageBase):
-    type: Literal["conversation.item.truncate"] = "conversation.item.truncate"
-    item_id: str
-    content_index: int
-    audio_end_ms: int
-
-
-class ItemDeleteMessage(ClientMessageBase):
-    type: Literal["conversation.item.delete"] = "conversation.item.delete"
-    item_id: str
 
 
 class ResponseCreateParams(BaseModel):
@@ -537,8 +527,6 @@ UserMessageType = Annotated[
         InputAudioBufferCommitMessage,
         InputAudioBufferClearMessage,
         ItemCreateMessage,
-        ItemTruncateMessage,
-        ItemDeleteMessage,
         ResponseCreateMessage,
         ResponseCancelMessage,
     ],

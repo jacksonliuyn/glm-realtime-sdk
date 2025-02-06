@@ -7,7 +7,19 @@ from typing import Annotated, Literal, Optional, Union
 
 from pydantic import BaseModel, Field
 
-from .models import RealtimeError, ResponseItem, ServerMessageBase
+from .models import ClientMessageBase, RealtimeError, ResponseItem, ServerMessageBase
+
+
+class ItemTruncateMessage(ClientMessageBase):
+    type: Literal["conversation.item.truncate"] = "conversation.item.truncate"
+    item_id: str
+    content_index: int
+    audio_end_ms: int
+
+
+class ItemDeleteMessage(ClientMessageBase):
+    type: Literal["conversation.item.delete"] = "conversation.item.delete"
+    item_id: str
 
 
 class InputAudioBufferClearedMessage(ServerMessageBase):
@@ -113,8 +125,10 @@ class RateLimitsUpdatedMessage(ServerMessageBase):
     rate_limits: list[RateLimits]
 
 
-DeprecatedServerMessageType = Annotated[
+DeprecatedMessageType = Annotated[
     Union[
+        ItemTruncateMessage,
+        ItemDeleteMessage,
         InputAudioBufferClearedMessage,
         ItemTruncatedMessage,
         ItemDeletedMessage,
