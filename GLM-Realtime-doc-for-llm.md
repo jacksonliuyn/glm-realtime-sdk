@@ -679,6 +679,7 @@ Realtime API支持两种VAD检测方式：Server VAD模式模型智能检测，�
 | type           | string | 事件类型必须是 `response.audio_transcript.delta` |
 | response_id | string | response事件的唯一id                           |
 | delta          | string | 模型输出的语音，转文本的结果。                           |
+| client_timestamp | Integer | 调用端发起调用的时间戳，毫秒                  |
 
 
 
@@ -709,30 +710,6 @@ Realtime API支持两种VAD检测方式：Server VAD模式模型智能检测，�
 {"event_id":"event45f876cc66064b69b783a7d7d584138e","type":"response.done","response":{"id":"respb8a11b86aab241e99c7a98d0f393758c","object":"realtime.response","status":"in_progress"}}
 ```
 
-### RealtimeServerEventResponseTextDone
-
-当模型回复文本输出完成时，系统会返回 `response.text.done` 事件，其中包括了模型返回的全部文本内容
-
-
-
-如果文本输出被打断，不会返回该事件。此部分存在特殊情况，因文本比语音输出更快，可能出现文本已经输出完成但语音未输出完成被打断的情况，此时只会返回`response.text.done`事件而不返回`response.done`事件。
-
-| **参数名称**    | **类型** | **参数描述**                     |
-| ----------- | ------ | ---------------------------- |
-| event_id | string | 服务器事件的唯一id                   |
-| type        | string | 事件类型必须是 `response.text.done` |
-| response    | object | Realtimeresponse返回结果         |
-
-* 示例：
-
-
-```python
-{
-    "event_id":"event7c0c573cfbe0481ba63871d6d988fca8",
-    "type":"response.text.done",
-    "text": "这是累积的全部文字"
-}
-```
 
 ### RealtimeServerEventResponseDone
 
