@@ -53,6 +53,8 @@ class InputAudioTranscription(BaseModel):
 
 class ClientMessageBase(ModelWithDefaults):
     event_id: Optional[str] = ""
+    client_timestamp: Optional[int] = None
+
 
 
 Temperature = Annotated[float, Field(strict=True, ge=0, le=1.2)]
@@ -103,7 +105,6 @@ class InputVideoFrameAppendMessage(ClientMessageBase):
 
     type: Literal["input_audio_buffer.append_video_frame"] = "input_audio_buffer.append_video_frame"
     video_frame: str  # base64编码的图片数据
-    client_timestamp: Optional[int] = None
 
 
 class InputAudioBufferCommitMessage(ClientMessageBase):
@@ -526,7 +527,6 @@ class HeartbeatMessage(ServerMessageBase):
     """服务器心跳消息"""
 
     type: Literal["heartbeat"] = "heartbeat"
-    client_timestamp: Optional[int] = None
 
 
 UserMessageType = Annotated[
