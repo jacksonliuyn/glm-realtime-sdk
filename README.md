@@ -95,6 +95,14 @@ python samples/low_level_sample_video.py samples/input/what_you_see_tts.wav samp
 python samples/low_level_sample_function_call.py samples/input/call_zhangsan.wav
 ```
 
+#### 4.4 服务端VAD示例
+
+```bash
+python samples/low_level_sample_server_vad.py samples/input/give_me_a_joke.wav
+```
+
+
+
 
 ## 许可证
 

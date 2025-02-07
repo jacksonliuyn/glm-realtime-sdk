@@ -14,7 +14,8 @@ aiohttp = "*"
 pydantic = "*"
 python-dotenv = "^1.0.1"
 pillow = "^11.1.0"
-
+soundfile = "^0.12.1"
+numpy = "^1.26.1"
 [tool.poetry.dev-dependencies]
 ruff = "*"
 black = "*"
