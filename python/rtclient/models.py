@@ -10,7 +10,6 @@ from pydantic import (
 
 from rtclient.util.model_helpers import ModelWithDefaults
 
-# Voice 不需要限制具体取值，使用字符串类型
 Voice = str
 
 AudioFormat = Literal["wav", "mp3", "pcm"]
@@ -29,7 +28,6 @@ class ServerVAD(ModelWithDefaults):
 
 
 class ClientVAD(ModelWithDefaults):
-    """智谱API使用的客户端VAD设置"""
 
     type: Literal["client_vad"] = "client_vad"
 
@@ -95,7 +93,7 @@ class InputAudioBufferAppendMessage(ClientMessageBase):
     """
 
     type: Literal["input_audio_buffer.append"] = "input_audio_buffer.append"
-    audio: str
+    audio: str # base64编码的音频数据
 
 
 class InputVideoFrameAppendMessage(ClientMessageBase):

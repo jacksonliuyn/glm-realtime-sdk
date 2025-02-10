@@ -20,7 +20,6 @@ from rtclient.models import (
     SessionUpdateParams,
 )
 
-# 全局变量用于控制程序状态
 shutdown_event: Optional[asyncio.Event] = None
 
 def handle_shutdown(sig=None, frame=None):
@@ -94,7 +93,7 @@ async def send_audio(client: RTLowLevelClient, audio_file_path: str):
 
         print(f"音频信息: 采样率={frame_rate}Hz, 声道数={channels}, 位深={sample_width*8}位")
         
-        # 计算相关参数
+        #  根据 servervad 的设置模拟一个较为贴合的场景, 计算相关参数, 实际使用时参数可以调整, 不必严格遵守
         frame_size = 1536  # 固定帧大小（采样点数）
         step_ms =  32     # 发送间隔（毫秒）
         step_samples = int(frame_rate * step_ms / 1000)  # 每步采样点数
@@ -234,7 +233,6 @@ async def with_zhipu(audio_file_path: str):
     global shutdown_event
     shutdown_event = asyncio.Event()
     
-    # 设置信号处理
     for sig in (signal.SIGINT, signal.SIGTERM):
         signal.signal(sig, handle_shutdown)
         
@@ -244,7 +242,6 @@ async def with_zhipu(audio_file_path: str):
             if shutdown_event.is_set():
                 return
                 
-            # 配置 ServerVAD
             session_message = SessionUpdateMessage(
                 session=SessionUpdateParams(
                     input_audio_format="wav",
@@ -264,7 +261,6 @@ async def with_zhipu(audio_file_path: str):
             if shutdown_event.is_set():
                 return
 
-            # 创建并发任务
             send_task = asyncio.create_task(send_audio(client, audio_file_path))
             receive_task = asyncio.create_task(receive_messages(client))
             

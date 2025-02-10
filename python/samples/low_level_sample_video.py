@@ -18,7 +18,6 @@ from rtclient.models import (
     SessionUpdateParams,
 )
 
-# 全局变量用于控制程序状态
 shutdown_event: Optional[asyncio.Event] = None
 
 
@@ -195,7 +194,7 @@ async def with_zhipu(audio_file_path: str, image_file_path: str):
     global shutdown_event
     shutdown_event = asyncio.Event()
     
-    # 设置信号处理
+
     for sig in (signal.SIGINT, signal.SIGTERM):
         signal.signal(sig, handle_shutdown)
         
@@ -225,7 +224,7 @@ async def with_zhipu(audio_file_path: str, image_file_path: str):
             if shutdown_event.is_set():
                 return
             
-            # 创建并发任务
+            
             send_task = asyncio.create_task(send_media(client, audio_file_path, image_file_path))
             receive_task = asyncio.create_task(receive_messages(client))
             

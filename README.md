@@ -10,11 +10,14 @@
 │   ├── rtclient/          # SDK 核心代码
 │   │   ├── __init__.py    # 包初始化文件
 │   │   ├── models.py      # 数据模型定义
+│   │   ├── deprecated_models.py  # 暂未实现的 openai数据模型定义,逐步对齐中
 │   │   └── low_level_client.py  # 底层客户端实现
 │   ├── samples/           # 示例代码
 │   │   ├── input/        # 示例输入文件
 │   │   ├── low_level_sample_audio.py  # 音频模式示例
 │   │   └── low_level_sample_video.py  # 视频模式示例
+│   │   └── low_level_sample_server_vad.py  # 服务端VAD示例
+│   │   └── low_level_sample_function_call.py  # 函数调用示例
 │   ├── pyproject.toml    # Poetry 项目配置文件
 │   ├── poetry.lock       # Poetry 依赖锁定文件
 │   └── .env.example      # 环境变量示例文件
@@ -34,7 +37,7 @@
 cd python
 ```
 
-#### 2.1 安装 Poetry
+#### 2.1 安装 Poetry (一个现代的 Python 包管理工具)
 
 ```bash
 pip install poetry
