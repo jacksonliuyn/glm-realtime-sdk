@@ -75,7 +75,6 @@ def encode_wave_to_base64(wave_file_path):
 
 async def send_audio(client: RTLowLevelClient, audio_file_path: str):
     """发送音频"""
-    # 使用优化后的音频编码函数
     base64_content = encode_wave_to_base64(audio_file_path)
     if base64_content is None:
         print("音频编码失败")

@@ -25,7 +25,6 @@ from rtclient.models import (
 shutdown_event: Optional[asyncio.Event] = None
 
 def handle_shutdown(sig=None, frame=None):
-    """处理关闭信号"""
     if shutdown_event:
         print("\n正在关闭程序...")
         shutdown_event.set()

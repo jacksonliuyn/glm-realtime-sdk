@@ -28,47 +28,6 @@ def handle_shutdown(sig=None, frame=None):
         print("\n正在关闭程序...")
         shutdown_event.set()
 
-def encode_wave_to_base64(wave_file_path):
-    """
-    将WAV文件转换为base64编码，确保生成标准的WAV格式
-    Args:
-        wave_file_path: WAV文件路径
-    Returns:
-        base64编码的字符串
-    """
-    try:
-        with wave.open(wave_file_path, 'rb') as wave_file:
-            # 获取音频参数
-            channels = wave_file.getnchannels()
-            sample_width = wave_file.getsampwidth()
-            frame_rate = wave_file.getframerate()
-            frames = wave_file.readframes(wave_file.getnframes())
-            
-            # 验证音频参数是否合法
-            if channels < 1 or sample_width < 1 or frame_rate <= 0:
-                print(f"无效的音频参数: channels={channels}, sample_width={sample_width}, frame_rate={frame_rate}")
-                return None
-            
-            # 创建字节流并写入标准WAV格式
-            wave_io = BytesIO()
-            with wave.open(wave_io, 'wb') as wave_out:
-                # 设置WAV文件头部信息
-                wave_out.setnchannels(channels)
-                wave_out.setsampwidth(sample_width)  # 位深度 (1 = 8位, 2 = 16位, etc.)
-                wave_out.setframerate(frame_rate)    # 采样率 (常见值: 44100, 48000)
-                # 写入音频数据
-                wave_out.writeframes(frames)
-
-            # 确保写入完整的WAV文件数据
-            wave_io.seek(0)
-            
-            # 获取字节数据并编码为base64
-            print(f"音频参数: 声道数={channels}, 位深度={sample_width*8}位, 采样率={frame_rate}Hz")
-            return base64.b64encode(wave_io.getvalue()).decode('utf-8')
-    except Exception as e:
-        print(f"音频文件处理错误: {str(e)}")
-        return None
-
 async def send_audio(client: RTLowLevelClient, audio_file_path: str):
     """
         持续分帧发送音频：
