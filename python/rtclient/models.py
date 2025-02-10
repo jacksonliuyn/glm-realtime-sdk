@@ -75,7 +75,7 @@ class SessionUpdateParams(BaseModel):
     tools: Optional[ToolsDefinition] = None
     tool_choice: Optional[ToolChoice] = None
     temperature: Optional[Temperature] = None
-    max_response_output_tokens: Optional[MaxTokensType] = None
+    max_output_tokens: Optional[MaxTokensType] = None
     beta_fields: Optional[dict] = None
 
 
