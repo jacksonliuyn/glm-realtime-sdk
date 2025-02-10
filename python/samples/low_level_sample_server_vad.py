@@ -252,7 +252,7 @@ async def with_zhipu(audio_file_path: str):
                     modalities={"audio", "text"},
                     turn_detection=ServerVAD(),
                     beta_fields={
-                        "chat_mode": "video_passive",
+                        "chat_mode": "audio",
                         "tts_source": "e2e",
                         "auto_search": False
                     },
